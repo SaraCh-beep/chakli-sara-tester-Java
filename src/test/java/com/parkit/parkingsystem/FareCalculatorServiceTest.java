@@ -1,7 +1,5 @@
 package com.parkit.parkingsystem;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -164,40 +162,44 @@ public class FareCalculatorServiceTest {
 
     @Test
     public void calculateFareCarWithDiscount() {
-        // Given
-        Ticket ticket = new Ticket();
-        ticket.setParkingSpot(new ParkingSpot(1, ParkingType.CAR, true));
-        // Convertir LocalDateTime en Date
-        LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(60); // 60 minutes d'utilisation
-        ticket.setInTime(Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()));
-        ticket.setOutTime(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
-        
-        FareCalculatorService fareCalculatorService = new FareCalculatorService();
-        
-        // When
-        fareCalculatorService.calculateFare(ticket, true);
-        
-        // Then
-        assertEquals(ticket.getPrice(), Fare.CAR_RATE_PER_HOUR * 0.95, 0.01); // Vérifie 95%
+        // Créer les dates d'entrée et de sortie
+        Date inTime = new Date();
+        inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000)); // 1 heure de stationnement
+        Date outTime = new Date();
+
+        // Créer un ParkingSpot sans utiliser de paramètres nommés
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+
+        // Définir les temps d'entrée et de sortie dans le ticket
+        ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+
+        // Appeler la méthode calculateFare avec le bon paramètre
+        fareCalculatorService.calculateFare(ticket, true); // true pour indiquer un utilisateur régulier
+
+        // Vérifier que le prix est correct avec la réduction
+        assertEquals(Fare.CAR_RATE_PER_HOUR * 0.95, ticket.getPrice(), 0.001); // Vérifie que la réduction est appliquée
     }
     
     @Test
     public void calculateFareBikeWithDiscount() {
-        // Given
-        Ticket ticket = new Ticket();
-        ticket.setParkingSpot(new ParkingSpot(1, ParkingType.BIKE, true));
-        // Convertir LocalDateTime en Date
-        LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(60); // 60 minutes d'utilisation
-        ticket.setInTime(Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()));
-        ticket.setOutTime(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
+        Date inTime = new Date();
+        inTime.setTime(System.currentTimeMillis() - (60 * 60 * 1000)); // 1 heure de parking
+        Date outTime = new Date();
         
-        FareCalculatorService fareCalculatorService = new FareCalculatorService();
+        // Créer un ParkingSpot sans utiliser de paramètres nommés
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE, false);
         
-        // When
-        fareCalculatorService.calculateFare(ticket, true);
+        ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
         
-        // Then
-        assertEquals(ticket.getPrice(), Fare.BIKE_RATE_PER_HOUR * 0.95, 0.01); // Vérifie 95%
+        // Appeler la méthode calculateFare avec le bon paramètre
+        fareCalculatorService.calculateFare(ticket, true); // true pour un utilisateur régulier
+        
+        // Vérifier que le prix est correct avec la réduction
+        assertEquals(Fare.BIKE_RATE_PER_HOUR * 0.95, ticket.getPrice(), 0.001);
     }
 
 }
