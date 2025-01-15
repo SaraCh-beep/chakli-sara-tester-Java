@@ -8,7 +8,7 @@ import com.parkit.parkingsystem.model.Ticket;
 <span class="nc" id="L8">        calculateFare(ticket, false);</span>
 <span class="nc" id="L9">    }</span>
 
-    public void calculateFare(Ticket ticket, boolean discount) {
+    public void calculateFare(Ticket ticket, boolean isRegularUser) {
 <span class="pc bpc" id="L12" title="1 of 4 branches missed.">        if ((ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime()))) {</span>
 <span class="fc" id="L13">            throw new IllegalArgumentException(&quot;Out time provided is incorrect:&quot; + ticket.getOutTime().toString());</span>
         }
@@ -45,7 +45,7 @@ import com.parkit.parkingsystem.model.Ticket;
 <span class="fc" id="L45">        double price = durationInHours * ratePerHour;</span>
 
         // Application de la réduction de 5% si applicable
-<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (discount) {</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (isRegularUser) {</span>
 <span class="fc" id="L49">            price *= 0.95;</span>
         }
 

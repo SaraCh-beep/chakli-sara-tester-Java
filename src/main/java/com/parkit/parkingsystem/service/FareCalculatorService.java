@@ -8,7 +8,7 @@ public class FareCalculatorService {
         calculateFare(ticket, false);
     }
 
-    public void calculateFare(Ticket ticket, boolean discount) {
+    public void calculateFare(Ticket ticket, boolean isRegularUser) {
         if ((ticket.getOutTime() == null) || (ticket.getOutTime().before(ticket.getInTime()))) {
             throw new IllegalArgumentException("Out time provided is incorrect:" + ticket.getOutTime().toString());
         }
@@ -45,7 +45,7 @@ public class FareCalculatorService {
         double price = durationInHours * ratePerHour;
 
         // Application de la réduction de 5% si applicable
-        if (discount) {
+        if (isRegularUser) {
             price *= 0.95;
         }
 

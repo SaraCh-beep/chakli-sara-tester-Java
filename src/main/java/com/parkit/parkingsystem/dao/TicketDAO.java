@@ -1,17 +1,18 @@
 package com.parkit.parkingsystem.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Timestamp;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.parkit.parkingsystem.config.DataBaseConfig;
 import com.parkit.parkingsystem.constants.DBConstants;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
 
 public class TicketDAO {
 
@@ -86,4 +87,39 @@ public class TicketDAO {
         }
         return false;
     }
+
+    /**
+     * Cette méthode compte le nombre de tickets associés à un véhicule donné
+     * Elle est utilisée pour déterminer si un véhicule est un utilisateur régulier
+     * @param vehicleRegNumber Le numéro d'immatriculation du véhicule
+     * @return Le nombre de tickets trouvés pour ce véhicule
+     */
+    public int getNbTicket(String vehicleRegNumber) {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            // Obtient une connexion
+            con = dataBaseConfig.getConnection();
+            
+            // Prépare et exécute la requête
+            ps = con.prepareStatement("SELECT COUNT(*) as nb FROM ticket WHERE VEHICLE_REG_NUMBER=?");
+            ps.setString(1, vehicleRegNumber);
+            rs = ps.executeQuery();
+            
+            if(rs.next()) {
+                return rs.getInt("nb");
+            }
+            return 0;
+        } catch (Exception ex) {
+            logger.error("Error fetching ticket count",ex);
+            return 0;
+        } finally {
+            // Ferme les ressources
+            dataBaseConfig.closeResultSet(rs);
+            dataBaseConfig.closePreparedStatement(ps);
+            dataBaseConfig.closeConnection(con);
+        }
+    }
+
 }
